@@ -33,7 +33,7 @@ nano ~/wireguard/docker-compose.yml
 - this will create a directory for wireguard and the wireguard config and allow you to create a file to edit
 
 Copy and paste the content below into the docker-compose.yml file :
-`` version: '3.8'
+``` version: '3.8'
 services:
   wireguard:
     container_name: wireguard
@@ -62,7 +62,7 @@ services:
       - SYS_MODULE
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-`` 
+``` 
 Change the SERVERURL to your DigitalOcean Droplet's IP address
 Change PEERS and TZ if needed
 
