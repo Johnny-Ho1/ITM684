@@ -100,7 +100,7 @@ Before activating the tunnel, note your IP address at [ipleak.net](ipleak.net)
 <img src = "images/DockerOff.png">
 
 Activate your tunnel and take a note of the new IP address
-<img src = "images/DockerOn.png">
+<img src = "images/DockerOn.PNG">
 
 
 
