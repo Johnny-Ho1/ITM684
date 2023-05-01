@@ -97,10 +97,10 @@ Make sure the DigitalOcean droplet is active
 After Wireguard is done downloading, add a tunnel and select the .conf file you located earlier
 
 Before activating the tunnel, note your IP address at [ipleak.net](ipleak.net)
-<img src = "/DockerOff.png">
+<img src = "images/DockerOff.png">
 
 Activate your tunnel and take a note of the new IP address
-<img src = "/DockerOn.png">
+<img src = "images/DockerOn.png">
 
 
 
