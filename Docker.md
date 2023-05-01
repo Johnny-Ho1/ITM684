@@ -87,6 +87,22 @@ I used CyberDuck
 - For the username, use the name of the user you created
 - I left the SSH port on default at port 22 but this is not recommended
 
+After downloading the config file, go into the peer_(name) folder and look for the .conf file inside
+
+
+# Running the VPN 
+Download Wireguard [here](https://www.wireguard.com/install/)
+Make sure the DigitalOcean droplet is active
+
+After Wireguard is done downloading, add a tunnel and select the .conf file you located earlier
+
+Before activating the tunnel, note your IP address at [ipleak.net](ipleak.net)
+<img src = "/DockerOff.png">
+
+Activate your tunnel and take a note of the new IP address
+<img src = "/DockerOn.png">
+
+
 
 
 
