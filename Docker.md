@@ -72,6 +72,24 @@ cd into the wireguard directory created earlier
 Run the following command to run the scripts to start Wireguard:
 sudo docker-compose up -d
 
+When the output says that the creation of Wireguard is done, run this command
+
+sudo docker-compose logs -f wireguard
+- this will create an execution log and the QR code of the Wireguard VPN
+
+You will know it works when there is a big QR code in the output
+
+
+## Locating Config File
+To get the config file, you will have to SFTP into the droplet 
+I used CyberDuck
+- For the server, use the IP address of the droplet
+- For the username, use the name of the user you created
+- I left the SSH port on default at port 22 but this is not recommended
+
+
+
+
 
 
 
