@@ -228,7 +228,9 @@ You will now need to tell the UFW to allow forwarded packets by default as well
 - sudo nano /etc/default/ufw
 Change the value from DROP to ACCEPT
 
-Next you will need to modify your UFW to allow the ports that you specified earlier
+Next you will need to modify your UFW to allow the ports that you specified earlier. Allowing 443 and 53 will also ensure traffic will never get blocked
+- sudo ufw allow 443/tcp
+- sudo ufw allow 53/udp
 - sudo ufw allow 41325/tcp
 - sudo ufw allow OpenSSH
 
@@ -310,6 +312,19 @@ This will create a file called client1.ovpn inside your ~/client-configs/file di
 
 You will need to transsfer this file to whatever device you plan to use the VPN on. You can run the following sftp command to retrieve the file but you can also use a file sharing program like CyberDuck
 - sftp [name]@openvpn_server_ip:client-configs/files/client1.ovpn ~/
+
+Download (OpenVPN)[https://openvpn.net/community-downloads/]
+Copy the file that you retrieved from SFTP and paste it into the config file inside the OpenVPN folder
+
+Run OpenVPN and press connect once you have added the file to the folder. The VPN should now work, you can test it using an IP checker. I used (dnsleaktest.com)[dnsleaktest.com] but you can also use (ipleak.net)[ipleak.net]
+
+Before: 
+<img src = "images/OpenVpnoff.PNG">
+
+After:
+<img src = "images/OpenVpnoon.PNG">
+
+
 
 
 
