@@ -319,10 +319,10 @@ Copy the file that you retrieved from SFTP and paste it into the config file ins
 Run OpenVPN and press connect once you have added the file to the folder. The VPN should now work, you can test it using an IP checker. I used (dnsleaktest.com)[dnsleaktest.com] but you can also use (ipleak.net)[ipleak.net]
 
 Before: 
-<img src = "images/OpenVpnoff.PNG">
+<img src = "images/OpenVPNoff.PNG">
 
 After:
-<img src = "images/OpenVpnoon.PNG">
+<img src = "images/OpenVPNon.PNG">
 
 
 
