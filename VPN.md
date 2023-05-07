@@ -237,6 +237,81 @@ Restart your UFW
 - sudo ufw enable
 
 ## Starting OpenVPN
+Enable the OpenVPN service to start up at boot so you can connect to the VPN whenever the server is running
+- sudo systemctl -f enable openvpn-server@server.service
+Then start the OpenVPN Service
+- sudo systemctl start openvpn-server@server.service
+You can verify the service is active by running this command
+- sudo systemctl status openvpn-server@server.service
+
+## Creating Client Configuration Infrastructure
+Create a directory within the client-configs directory to store client configuration files
+- mkdir -p ~/client-configs/files
+Copy an example client config file into the directory to use as your base configuration
+- cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf ~/client-configs/base.conf
+- open the file
+Locate the "remote" directive and add your VPN server's IP along with the port you specified earlier to listen on. Make sure the protcol also matches if you changed the port
+
+Remove the ; next to the user nobody and group nogroup directives
+
+Find the directives that set the ca, cert, and key and add a ; in front of them to comment them out
+
+Comment out the tls-auth directive as well
+
+Use the cipher and auth settings from your server.conf file from earlier
+- cipher AES-256-GCM
+- auth SHA256
+Add the key-direction anywhere in the file and set it to 1
+- key-direction 1
+Add a few commented out lines to handle various methods that linux baed VPN clients use for DNS resolution. The first one will be for clients that do NOT use systemd-resolved and the second one will be for clients that DO use it
+```
+; script-security 2
+; up /etc/openvpn/update-resolv-conf
+; down /etc/openvpn/update-resolv-conf
+```
+```
+; script-security 2
+; up /etc/openvpn/update-systemd-resolved
+; down /etc/openvpn/update-systemd-resolved
+; down-pre
+; dhcp-option DOMAIN-ROUTE .
+```
+Exit the file and create a script that will compile your base configuration with the relevant certificate, key, and encryption files
+- nano ~/client-configs/make_config.sh
+ Add the following content inside the file
+ ```
+ #!/bin/bash
+ 
+# First argument: Client identifier
+ 
+KEY_DIR=~/client-configs/keys
+OUTPUT_DIR=~/client-configs/files
+BASE_CONFIG=~/client-configs/base.conf
+ 
+cat ${BASE_CONFIG} \
+    <(echo -e '<ca>') \
+    ${KEY_DIR}/ca.crt \
+    <(echo -e '</ca>\n<cert>') \
+    ${KEY_DIR}/${1}.crt \
+    <(echo -e '</cert>\n<key>') \
+    ${KEY_DIR}/${1}.key \
+    <(echo -e '</key>\n<tls-crypt>') \
+    ${KEY_DIR}/ta.key \
+    <(echo -e '</tls-crypt>') \
+    > ${OUTPUT_DIR}/${1}.ovpn
+```
+After saving the file, mark the file as an executable
+- chmod 700 ~/client-configs/make_config.sh
+
+## Generating Client Configurations
+Navigate into the client-configs directory and run the script you just created
+- ./make_config.sh client1
+This will create a file called client1.ovpn inside your ~/client-configs/file directory:
+
+You will need to transsfer this file to whatever device you plan to use the VPN on. You can run the following sftp command to retrieve the file but you can also use a file sharing program like CyberDuck
+- sftp [name]@openvpn_server_ip:client-configs/files/client1.ovpn ~/
+
+
 
 
 
