@@ -67,12 +67,15 @@ ca.key is the private key that the CA uses to sign certificates for servers and 
 Go into your ca.crt file by running the command:
 - cat ~/easy-rsa/pki/ca.crt
 There will be an output in your terminal similar to the following:
-``` -----BEGIN CERTIFICATE-----
+```
+-----BEGIN CERTIFICATE-----
 MIIDSzCCAjOgAwIBAgIUcR9Crsv3FBEujrPZnZnU4nSb5TMwDQYJKoZIhvcNAQEL
 BQAwFjEUMBIGA1UEAwwLRWFzeS1SU0EgQ0EwHhcNMjAwMzE4MDMxNjI2WhcNMzAw
 . . .
 . . .
------END CERTIFICATE----- ```
+-----END CERTIFICATE----- 
+
+```
 Copy and paste all of that text (including begin and end certificate with the dashes)
 
 In the other server that you created, run this command to create a filed called ca.crt
