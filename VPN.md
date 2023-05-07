@@ -15,7 +15,7 @@ Run the following:
 After creating the users and giving them access, you will have to set up the Firewall
 
 - ufw allow OpenSSH (this will allow OpenSSH to pass through your firewall)
-- ufw enable (this will enable your firwall) press y and enter to proceed
+- ufw enable (this will enable your firewall) press y and enter to proceed
 - Check the firewall by running the command: ufw status
 
 SSH into the new user account by running the command:
@@ -59,7 +59,7 @@ Exit out of the file by pressing CTRL-X, Y, then ENTER to confirm
 
 Run the following command to create the public and private key pair for your CA
 - ./easyrsa build-ca
-Fill out the information regarding the common name for your CN, for simplicity, you can just press ENTER to accept the deafult name
+Fill out the information regarding the common name for your CN, for simplicity, you can just press ENTER to accept the default name
 Running this script will also create two very important files for your server
 ca.crt is the CA’s public certificate file
 ca.key is the private key that the CA uses to sign certificates for servers and clients
@@ -74,7 +74,6 @@ BQAwFjEUMBIGA1UEAwwLRWFzeS1SU0EgQ0EwHhcNMjAwMzE4MDMxNjI2WhcNMzAw
 . . .
 . . .
 -----END CERTIFICATE----- 
-
 ```
 Copy and paste all of that text (including begin and end certificate with the dashes)
 
@@ -87,6 +86,169 @@ Staying on this server, run the following commands to iport the certificate from
 - sudo update-ca-certificates
 
 # Installing OpenVPN and Easy-RSA
+By now, you should have both servers created 
+
+## Installing OpenVPN and Easy-RSA
+Install OpenVPN and Easy-rsa
+- sudo apt update
+- sudo apt install openvpn easy-rsa
+
+Create a directory for easy-rsa
+- mkdir ~/easy-rsa
+
+Create a symlink from the easyrsa script into the directory just created
+- ln -s /usr/share/easy-rsa/* ~/easy-rsa/
+
+Make the owner of the directory your non-root sudo user
+- sudo chown [name] ~/easy-rsa
+- chmod 700 ~/easy-rsa
+
+## Create a PKI for OpenVPN
+Go to easy-rsa directory and create a file named vars and paste the following text into the file 
+```set_var EASYRSA_ALGO "ec"
+set_var EASYRSA_DIGEST "sha512" 
+```
+
+Save and exit the file. Then run the following script to create another PKI directory:
+- ./easyrsa init-pki
+
+## Create OpenVPN Certificate Request and Private Key
+Navigate to the easy-rsa directory in your VPN server
+Call the easyrsa script with the gen-req followed by the common name you saved earlier. If you used the default name, it will be server. The no-pass argument will not require you to put the password in multiple times
+- ./easyrsa gen-req server nopass
+
+Copy the server key created by the script into the openvpn/server directory
+- sudo cp /home/[name]/easy-rsa/pki/private/server.key /etc/openvpn/server/
+
+## Signing the OpenVPN Server's Certificate Request
+You will need to have both the CA server and VPN server for this step and the upcoming steps
+
+Open the VPN server and use scp (or any other transfer method) to copy the server.req certificate request to the CA server for signing. Remember to use the IP address of your CA server
+- scp /home/[name]/easy-rsa/pki/reqs/server.req [name]@your_ca_server_ip:/tmp
+
+On the CA Server, navigate to the easy-rsa directory and run the following script to import the certificate request
+- ./easyrsa import-req /tmp/server.req server
+The script should leave a message saying that the request has been successfully imported
+
+Run the easy-rsa script with the sign-req option followed by the request type and common name
+- ./easyrsa sign-req sever server
+Say yes and press enter to confirm the prompts
+
+To finish configuring the certificates, copy the server.crt and ca.crt files from the CA server to the OpenVPN server
+- scp pki/issued/server.crt [name]@your_vpn_server_ip:/tmp
+- scp pki/ca.crt [name]@your_vpn_server_ip:/tmp
+
+Back on your VPN server, copy the files from /tmp to /etc/openvpn/server
+- sudo cp /tmp/{server.crt,ca.crt} /etc/openvpn/server
+
+## Configuring OpenVPN Cryptographic Material
+On your VPN server, cd into your easy-rsa directory and generate the tls-cryp pre-shared key
+- openvpn --genkey --secret ta.key
+Copy the file ta.key into /etc/openvpn/server
+- sudo cp ta.key /etc/openvpn/server
+
+## Generating a Client Certificate and Key Pair
+Create a directory to store the client certificate and key files and lock down its permissions in case
+- mkdir -p ~/client-configs/keys
+- chmod -R 700 ~/client-configs
+
+Go back to the easy-rsa directory and run the following script
+- ./easyrsa gen-req client1 nopass
+
+Copy the client1.key file to the directory created earlier and transfer the file to your CA server
+- cp pki/private/client1.key ~/client-configs/keys/
+scp pki/reqs/client1.req [name]@your_ca_server_ip:/tmp
+
+On your CA server, navigate to the easy-rsa directory and import the certificate request
+- ./easyrsa import-req /tmp/client1.req client1
+Sign the request and enter yes to the prompt. Transfer the file created back to the VPN server
+- ./easyrsa sign-req client client1
+- scp pki/issued/client1.crt [name]@your_server_ip:/tmp
+
+Back on the VPN server, copy the client certificate to the clinet-configs directory
+- cp /tmp/client1.crt ~/client-configs/keys/
+
+Copy the ca.crt and ta.key files to the client configs directory as well and set the appropriate permissions for it
+- cp ~/easy-rsa/ta.key ~/client-configs/keys/
+- sudo cp /etc/openvpn/server/ca.crt ~/client-configs/keys/
+- sudo chown [name].[name] ~/client-configs/keys/*
+
+## Configuring OpenVPN
+Copy the server.conf file as a starting point for your own configuration file
+- sudo cp /usr/share/doc/openvpn/examples/sample-config-files/server.conf /etc/openvpn/server/
+Open the file
+- sudo nano /etc/openvpn/server/server.conf
+You will need to look for the following sections and change them. The [] will indicate that this was added to the file
+```
+[;]tls-auth ta.key 0 # This file is secret
+[tls-crypt ta.key]
+```
+```
+[;]cipher AES-256-CBC
+[cipher AES-256-GCM]
+[auth SHA256]
+```
+```
+[;]dh dh2048.pem
+[dh none]
+```
+Uncomment the user nobody and group nogroup lines by removing the ;
+
+Change the port number and protcol if necessary, for the sake of this project, I used port 41325. If you decide to switch the protocol to TCP, you will need to change the ```explicit-exit-notify``` value from 1 to 0
+
+Save and exit the file
+
+## Adjusting OpenVPN Server Networking Configuration
+Adjust OpenVpn's default IP forwarding setting by opening the sysctl.conf file
+- sudo nano /etc/sysctl.conf
+Add this line at the bottom of the file and save and exit after
+- net.ipv4.ip_forward = 1
+
+## Firewall Configuration
+Find the public network interface of your machine
+- ip route list default
+Look for the word that comes after "dev" and keep note of that as it is your public interface. An example output would look like
+```
+default via 159.65.160.1 dev [eth0] proto static
+```
+Open the before.rules file to add the relevant configuration
+- sudo nano /etc/ufw/before.rules
+Place the public interface into this area within the file:
+```
+# START OPENVPN RULES
+# NAT table rules
+*nat
+:POSTROUTING ACCEPT [0:0]
+# Allow traffic from OpenVPN client to eth0 (change to the interface you discovered!)
+-A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE
+COMMIT
+# END OPENVPN RULES
+```
+You will now need to tell the UFW to allow forwarded packets by default as well
+- sudo nano /etc/default/ufw
+Change the value from DROP to ACCEPT
+
+Next you will need to modify your UFW to allow the ports that you specified earlier
+- sudo ufw allow 41325/tcp
+- sudo ufw allow OpenSSH
+
+Restart your UFW
+- sudo ufw disable
+- sudo ufw enable
+
+## Starting OpenVPN
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
