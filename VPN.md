@@ -339,6 +339,7 @@ Open the config.cfg file and specify the users in the users list. Make sure to c
 
 Run the deployment 
 - sudo ./algo
+
 Make sure to choose 12 when prompted to pick a service
 Fill out the remaining information
 You should be prompted with a congratulations screen after you are done
