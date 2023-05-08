@@ -324,6 +324,27 @@ Before:
 After:
 <img src = "images/OpenVPNon.PNG">
 
+# AlgoVPN Installation
+To install AlgoVPN on your server, you must firstg get a copy of Algo and install its core dependencies
+- git clone https://github.com/trailofbits/algo.git
+- sudo apt install -y --no-install-recommends python3-virtualenv
+
+Install Algo's remaining dependencies. You will need to run this inside the algo directory that was created from the previous installations
+```python3 -m virtualenv --python="$(command -v python3)" .env &&
+  source .env/bin/activate &&
+  python3 -m pip install -U pip virtualenv &&
+  python3 -m pip install -r requirements.txt
+  ```
+Open the config.cfg file and specify the users in the users list. Make sure to change the ssh ports and wireguard ports.
+
+Run the deployment 
+- sudo ./algo
+Make sure to choose 12 when prompted to pick a service
+Fill out the remaining information
+You should be prompted with a congratulations screen after you are done
+<img src ="images/algoworks.PNG">
+
+
 
 
 
