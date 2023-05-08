@@ -384,7 +384,9 @@ After: The IP address should be the same as your Digital Ocean IP Address
 These are some aliases I used during the creation of my project
 
 alias c ='clear' , helps clear the terminal of clutter
+
 alias rufw ='sudo ufw disable; sudo ufw enable' , helps reboot the UFW
+
 alias apt='sudo apt', removes the need to put sudo whenever installing packages
 
 ## Coloring the Terminal
