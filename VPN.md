@@ -365,6 +365,17 @@ Fill out the remaining information
 You should be prompted with a congratulations screen after you are done
 <img src ="images/algoworks.PNG">
 
+SFTP into the server and retrieve the configs folder from the algo directory
+
+Download (wireguard)[https://www.wireguard.com/install/]
+
+Inside the configs folder, there will be a file with a .conf ending. Import this file into your wireguard tunnel and activate the tunnel. The VPN should activate. To test this, I went on (ipleak.net)[ipleak.net]
+
+Before:
+<img src ="images/DockerOff.PNG">
+
+After:
+<img src = "images/Wireguard.PNG">
 
 
 
