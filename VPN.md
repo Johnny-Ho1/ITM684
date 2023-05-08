@@ -357,7 +357,7 @@ Install Algo's remaining dependencies. You will need to run this inside the algo
   ```
 Open the config.cfg file and specify the users in the users list. Make sure to change the ssh ports and wireguard ports.
 
-Run the deployment 
+Run the deployment. IT IS VERY IMPORTANT TO RUN IT WITH SUDO OR ELSE IT WILL NOT WORK
 - sudo ./algo
 
 Make sure to choose 12 when prompted to pick a service
@@ -374,8 +374,30 @@ Inside the configs folder, there will be a file with a .conf ending. Import this
 Before:
 <img src ="images/DockerOff.png">
 
-After:
+After: The IP address should be the same as your Digital Ocean IP Address
 <img src = "images/Wireguard.PNG">
+
+
+# Misc. Items
+
+## Cron Jobs
+These are some aliases I used during the creation of my project
+
+alias c ='clear' , helps clear the terminal of clutter
+alias rufw ='sudo ufw disable; sudo ufw enable' , helps reboot the UFW
+alias apt='sudo apt', removes the need to put sudo whenever installing packages
+
+## Coloring the Terminal
+Another task of this project was to change the colors of the terminal and the outputs
+
+Create a file called .bash_profile in your home directory using whatever text editor.
+
+Add the following command to the file:
+export PS1="\e[0;32m[\u@\h \W]\$ \e[m"
+
+The terminal should now be green on startup everytime it is run
+
+
 
 
 
