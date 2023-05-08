@@ -30,10 +30,12 @@ Create another Droplet using the same configurations as mentioned previously
 Login to your CA Server as the non-root sudo user that you created during the initial setup steps and run the following:
 - sudo apt update
 - sudo apt install easy-rsa
+
 This will install the easy-rsa packages as well as updating any other packages needed
 
 Run the following command to create a directory for your PKI
 - mkdir ~/easy-rsa
+
 You will then create a symbolic link pointing to the easy-rsa packages installed earlier
 - ln -s /usr/share/easy-rsa/* ~/easy-rsa/
 
@@ -59,6 +61,7 @@ Exit out of the file by pressing CTRL-X, Y, then ENTER to confirm
 
 Run the following command to create the public and private key pair for your CA
 - ./easyrsa build-ca
+
 Fill out the information regarding the common name for your CN, for simplicity, you can just press ENTER to accept the default name
 Running this script will also create two very important files for your server
 ca.crt is the CA’s public certificate file
@@ -66,6 +69,7 @@ ca.key is the private key that the CA uses to sign certificates for servers and 
 
 Go into your ca.crt file by running the command:
 - cat ~/easy-rsa/pki/ca.crt
+
 There will be an output in your terminal similar to the following:
 ```
 -----BEGIN CERTIFICATE-----
@@ -79,6 +83,7 @@ Copy and paste all of that text (including begin and end certificate with the da
 
 In the other server that you created, run this command to create a filed called ca.crt
 - nano /tmp/ca.crt
+
 Paste the contents into that file and save it.
 
 Staying on this server, run the following commands to iport the certificate from the CA server:
@@ -128,10 +133,12 @@ Open the VPN server and use scp (or any other transfer method) to copy the serve
 
 On the CA Server, navigate to the easy-rsa directory and run the following script to import the certificate request
 - ./easyrsa import-req /tmp/server.req server
+
 The script should leave a message saying that the request has been successfully imported
 
 Run the easy-rsa script with the sign-req option followed by the request type and common name
 - ./easyrsa sign-req sever server
+
 Say yes and press enter to confirm the prompts
 
 To finish configuring the certificates, copy the server.crt and ca.crt files from the CA server to the OpenVPN server
@@ -144,6 +151,7 @@ Back on your VPN server, copy the files from /tmp to /etc/openvpn/server
 ## Configuring OpenVPN Cryptographic Material
 On your VPN server, cd into your easy-rsa directory and generate the tls-cryp pre-shared key
 - openvpn --genkey --secret ta.key
+
 Copy the file ta.key into /etc/openvpn/server
 - sudo cp ta.key /etc/openvpn/server
 
@@ -156,11 +164,12 @@ Go back to the easy-rsa directory and run the following script
 - ./easyrsa gen-req client1 nopass
 
 Copy the client1.key file to the directory created earlier and transfer the file to your CA server
-- cp pki/private/client1.key ~/client-configs/keys/
-scp pki/reqs/client1.req [name]@your_ca_server_ip:/tmp
+- scp pki/private/client1.key ~/client-configs/keys/
+- scp pki/reqs/client1.req [name]@your_ca_server_ip:/tmp
 
 On your CA server, navigate to the easy-rsa directory and import the certificate request
 - ./easyrsa import-req /tmp/client1.req client1
+
 Sign the request and enter yes to the prompt. Transfer the file created back to the VPN server
 - ./easyrsa sign-req client client1
 - scp pki/issued/client1.crt [name]@your_server_ip:/tmp
@@ -176,8 +185,10 @@ Copy the ca.crt and ta.key files to the client configs directory as well and set
 ## Configuring OpenVPN
 Copy the server.conf file as a starting point for your own configuration file
 - sudo cp /usr/share/doc/openvpn/examples/sample-config-files/server.conf /etc/openvpn/server/
+
 Open the file
 - sudo nano /etc/openvpn/server/server.conf
+
 You will need to look for the following sections and change them. The [] will indicate that this was added to the file
 ```
 [;]tls-auth ta.key 0 # This file is secret
@@ -201,6 +212,7 @@ Save and exit the file
 ## Adjusting OpenVPN Server Networking Configuration
 Adjust OpenVpn's default IP forwarding setting by opening the sysctl.conf file
 - sudo nano /etc/sysctl.conf
+
 Add this line at the bottom of the file and save and exit after
 - net.ipv4.ip_forward = 1
 
@@ -226,6 +238,7 @@ COMMIT
 ```
 You will now need to tell the UFW to allow forwarded packets by default as well
 - sudo nano /etc/default/ufw
+
 Change the value from DROP to ACCEPT
 
 Next you will need to modify your UFW to allow the ports that you specified earlier. Allowing 443 and 53 will also ensure traffic will never get blocked
@@ -241,9 +254,13 @@ Restart your UFW
 ## Starting OpenVPN
 Enable the OpenVPN service to start up at boot so you can connect to the VPN whenever the server is running
 - sudo systemctl -f enable openvpn-server@server.service
+
 Then start the OpenVPN Service
+
 - sudo systemctl start openvpn-server@server.service
+
 You can verify the service is active by running this command
+
 - sudo systemctl status openvpn-server@server.service
 
 ## Creating Client Configuration Infrastructure
@@ -263,7 +280,9 @@ Comment out the tls-auth directive as well
 Use the cipher and auth settings from your server.conf file from earlier
 - cipher AES-256-GCM
 - auth SHA256
+
 Add the key-direction anywhere in the file and set it to 1
+ 
 - key-direction 1
 Add a few commented out lines to handle various methods that linux baed VPN clients use for DNS resolution. The first one will be for clients that do NOT use systemd-resolved and the second one will be for clients that DO use it
 ```
@@ -307,7 +326,8 @@ After saving the file, mark the file as an executable
 
 ## Generating Client Configurations
 Navigate into the client-configs directory and run the script you just created
-- ./make_config.sh client1 <br/>
+- ./make_config.sh client1
+
 This will create a file called client1.ovpn inside your ~/client-configs/file directory
 
 You will need to transsfer this file to whatever device you plan to use the VPN on. You can run the following sftp command to retrieve the file but you can also use a file sharing program like CyberDuck
