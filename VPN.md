@@ -307,8 +307,8 @@ After saving the file, mark the file as an executable
 
 ## Generating Client Configurations
 Navigate into the client-configs directory and run the script you just created
-- ./make_config.sh client1
-This will create a file called client1.ovpn inside your ~/client-configs/file directory:
+- ./make_config.sh client1 <br/>
+This will create a file called client1.ovpn inside your ~/client-configs/file directory
 
 You will need to transsfer this file to whatever device you plan to use the VPN on. You can run the following sftp command to retrieve the file but you can also use a file sharing program like CyberDuck
 - sftp [name]@openvpn_server_ip:client-configs/files/client1.ovpn ~/
