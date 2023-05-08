@@ -333,10 +333,10 @@ This will create a file called client1.ovpn inside your ~/client-configs/file di
 You will need to transsfer this file to whatever device you plan to use the VPN on. You can run the following sftp command to retrieve the file but you can also use a file sharing program like CyberDuck
 - sftp [name]@openvpn_server_ip:client-configs/files/client1.ovpn ~/
 
-Download (OpenVPN)[https://openvpn.net/community-downloads/]
+Download [OpenVPN](https://openvpn.net/community-downloads/)
 Copy the file that you retrieved from SFTP and paste it into the config file inside the OpenVPN folder
 
-Run OpenVPN and press connect once you have added the file to the folder. The VPN should now work, you can test it using an IP checker. I used (dnsleaktest.com)[dnsleaktest.com] but you can also use (ipleak.net)[ipleak.net]
+Run OpenVPN and press connect once you have added the file to the folder. The VPN should now work, you can test it using an IP checker. I used (dnsleaktest.com)[dnsleaktest.com] but you can also use [ipleak.net](ipleak.net)
 
 Before: 
 <img src = "images/OpenVPNoff.PNG">
@@ -367,12 +367,12 @@ You should be prompted with a congratulations screen after you are done
 
 SFTP into the server and retrieve the configs folder from the algo directory
 
-Download (wireguard)[https://www.wireguard.com/install/]
+Download [wireguard](https://www.wireguard.com/install/)
 
-Inside the configs folder, there will be a file with a .conf ending. Import this file into your wireguard tunnel and activate the tunnel. The VPN should activate. To test this, I went on (ipleak.net)[ipleak.net]
+Inside the configs folder, there will be a file with a .conf ending. Import this file into your wireguard tunnel and activate the tunnel. The VPN should activate. To test this, I went on [ipleak.net](ipleak.net)
 
 Before:
-<img src ="images/DockerOff.PNG">
+<img src ="images/DockerOff.png">
 
 After:
 <img src = "images/Wireguard.PNG">
